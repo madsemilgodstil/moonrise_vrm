@@ -1,17 +1,19 @@
 'use client'
 
-import Hero from '@/components/hero/Hero'
+import dynamic from 'next/dynamic'
 import TranslatedText from '@/components/translatedText/TranslatedText'
-import TextImageSlider from '@/components/textImageSlider/TextImageSlider'
-import Stats from '@/components/stats/Stats'
-import Process from '@/components/process/Process'
-import {
-  FaMapMarkerAlt,
-  FaComments,
-  FaPencilRuler,
-  FaClipboardCheck,
-  FaPlay
-} from 'react-icons/fa'
+
+const Hero = dynamic(() => import('@/components/hero/Hero'), { ssr: false })
+const TextImageSlider = dynamic(() => import('@/components/textImageSlider/TextImageSlider'), { ssr: false })
+const Stats = dynamic(() => import('@/components/stats/Stats'), { ssr: false })
+const Process = dynamic(() => import('@/components/process/Process'), { ssr: false })
+
+// Lazy load ikoner
+const FaMapMarkerAlt = dynamic(() => import('react-icons/fa').then(mod => mod.FaMapMarkerAlt))
+const FaComments = dynamic(() => import('react-icons/fa').then(mod => mod.FaComments))
+const FaPencilRuler = dynamic(() => import('react-icons/fa').then(mod => mod.FaPencilRuler))
+const FaClipboardCheck = dynamic(() => import('react-icons/fa').then(mod => mod.FaClipboardCheck))
+const FaPlay = dynamic(() => import('react-icons/fa').then(mod => mod.FaPlay))
 
 export default function Service () {
   return (

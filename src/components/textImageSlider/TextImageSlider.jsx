@@ -129,7 +129,7 @@ const TextImageSlider = ({
                   fill
                   className="object-cover rounded-lg"
                   sizes="400px"
-                  priority={true}
+                  loading="lazy"
                 />
                 {overlayOpacity > 0 && (
                   <div

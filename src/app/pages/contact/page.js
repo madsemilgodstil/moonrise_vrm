@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react';
-import TextImageSlider from '@/components/textImageSlider/TextImageSlider';
-import Hero from '@/components/hero/Hero';
-import Trustpilot from '@/components/trustpilot/Trustpilot';
-import Newsletter from '@/components/newsletter/Newsletter';
+import dynamic from 'next/dynamic';
 import { getReviews } from '@/lib/supabase';
+
+const TextImageSlider = dynamic(() => import('@/components/textImageSlider/TextImageSlider'), { ssr: false });
+const Hero = dynamic(() => import('@/components/hero/Hero'), { ssr: false });
+const Trustpilot = dynamic(() => import('@/components/trustpilot/Trustpilot'), { ssr: false });
+const Newsletter = dynamic(() => import('@/components/newsletter/Newsletter'), { ssr: false });
 
 export default function Contact() {
   const [reviews, setReviews] = useState([]);

@@ -3,9 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import LanguageSwitch from "@/components/languageSwitcher/LanguageSwitch";
+import dynamic from 'next/dynamic';
 import TranslatedText from "@/components/translatedText/TranslatedText";
 import BurgerMenu from "./BurgerMenu";
+
+const LanguageSwitch = dynamic(() => import("@/components/languageSwitcher/LanguageSwitch"), { ssr: false });
 
 export default function Navigation() {
   const pathname = usePathname();

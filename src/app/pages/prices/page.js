@@ -1,8 +1,10 @@
 'use client';
 
-import Hero from "@/components/hero/Hero";
+import dynamic from 'next/dynamic';
 import TranslatedText from "@/components/translatedText/TranslatedText";
-import PriceCalculator from "@/components/priceCalculator/PriceCalculator";
+
+const Hero = dynamic(() => import("@/components/hero/Hero"), { ssr: false });
+const PriceCalculator = dynamic(() => import("@/components/priceCalculator/PriceCalculator"), { ssr: false });
 
 export default function Prices() {
   return (

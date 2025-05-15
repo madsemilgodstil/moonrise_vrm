@@ -1,5 +1,6 @@
 "use client";
 
+import Image from 'next/image';
 import TranslatedText from "@/components/translatedText/TranslatedText";
 
 const ShowCard = ({ image, title, description, date, adresse }) => {
@@ -22,7 +23,14 @@ const ShowCard = ({ image, title, description, date, adresse }) => {
     <div className="relative">
       <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
         {image ? (
-          <img src={image} alt={title} className="object-cover w-full h-full" />
+          <Image
+            src={image}
+            alt={title}
+            className="object-cover w-full h-full"
+            width={400}
+            height={300}
+            loading="lazy"
+          />
         ) : (
           <div className="w-full h-full bg-gray-800 flex items-center justify-center">
             <span className="text-gray-400 text-sm">

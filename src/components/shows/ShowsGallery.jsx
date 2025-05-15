@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ShowCard from "./ShowCard";
+import dynamic from 'next/dynamic';
 import TranslatedText from "@/components/translatedText/TranslatedText";
+
+const ShowCard = dynamic(() => import("./ShowCard"), { ssr: false });
 
 const ShowsGallery = ({ shows }) => {
   const [upcomingShows, setUpcomingShows] = useState([]);

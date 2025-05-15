@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Hero from "@/components/hero/Hero";
-import ShowsGallery from "@/components/shows/ShowsGallery";
+import dynamic from 'next/dynamic';
 import { getShows } from '@/lib/supabase';
+
+const Hero = dynamic(() => import("@/components/hero/Hero"), { ssr: false });
+const ShowsGallery = dynamic(() => import("@/components/shows/ShowsGallery"), { ssr: false });
 
 export default function Shows() {
   const [shows, setShows] = useState([]);
