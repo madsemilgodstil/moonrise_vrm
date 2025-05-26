@@ -15,6 +15,7 @@ const PriceCalculator = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState("");
+  const [errors, setErrors] = useState({});
   const [droneCount, setDroneCount] = useState(50);
   const FIXED_COST = 10000;
 
@@ -51,10 +52,39 @@ const PriceCalculator = () => {
       : `${formattedNumber} kr.`;
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+    
+    // Validate name (at least 2 characters, only letters and spaces)
+    if (!formData.name.trim() || formData.name.length < 2 || !/^[a-zA-ZæøåÆØÅ\s]+$/.test(formData.name)) {
+      newErrors.name = "Please enter a valid name (minimum 2 characters, letters only)";
+    }
+
+    // Validate email
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    // Validate price range
+    if (formData.price < 125000 || formData.price > 500000) {
+      newErrors.price = "Price must be between 125,000 and 500,000 kr";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    setErrors({});
     setSubmitStatus("");
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
 
     try {
       // Send PDF via API
@@ -133,14 +163,18 @@ const PriceCalculator = () => {
                 <label className="block mb-2">
                   <TranslatedText>Navn</TranslatedText>
                 </label>
+                {errors.name && <p className="text-red-500 text-sm mb-1">{errors.name}</p>}
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
-                  className="w-full px-4 py-2 rounded bg-gray-800 border border-gray-700 focus:border-blue-500 focus:outline-none"
+                  className={`w-full px-4 py-2 rounded bg-gray-800 border ${errors.name ? 'border-red-500' : 'border-gray-700'} focus:border-blue-500 focus:outline-none`}
                   required
+                  pattern="^[a-zA-ZæøåÆØÅ\s]+$"
+                  minLength="2"
+                  title="Please enter a valid name (minimum 2 characters, letters only)"
                   disabled={isSubmitting}
                   aria-label={<TranslatedText>Indtast dit navn</TranslatedText>}
                 />
@@ -150,14 +184,17 @@ const PriceCalculator = () => {
                 <label className="block mb-2">
                   <TranslatedText>Email</TranslatedText>
                 </label>
+                {errors.email && <p className="text-red-500 text-sm mb-1">{errors.email}</p>}
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
-                  className="w-full px-4 py-2 rounded bg-gray-800 border border-gray-700 focus:border-blue-500 focus:outline-none"
+                  className={`w-full px-4 py-2 rounded bg-gray-800 border ${errors.email ? 'border-red-500' : 'border-gray-700'} focus:border-blue-500 focus:outline-none`}
                   required
+                  pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                  title="Please enter a valid email address"
                   disabled={isSubmitting}
                   aria-label={
                     <TranslatedText>Indtast din email</TranslatedText>

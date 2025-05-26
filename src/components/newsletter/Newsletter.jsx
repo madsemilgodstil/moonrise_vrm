@@ -11,6 +11,7 @@ const Newsletter = () => {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   // Fjern status besked efter 5 sekunder
   useEffect(() => {
@@ -22,15 +23,31 @@ const Newsletter = () => {
     }
   }, [status]);
 
+  const validateEmail = (email) => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    setError("");
     setStatus("");
 
-    const result = await saveNewsletter(email);
-    setStatus(result.status);
-    setEmail(""); // Altid nulstil email feltet
-    setIsSubmitting(false);
+    if (!validateEmail(email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      const result = await saveNewsletter(email);
+      setStatus(result.status);
+      setEmail(""); // Reset email field
+    } catch (err) {
+      setError("An error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -98,6 +115,8 @@ const Newsletter = () => {
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Email"
                       required
+                      pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                      title="Please enter a valid email address"
                       className="flex-1 bg-white rounded-md px-4 py-2 text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[var(--blue)] transition-colors"
                     />
                     <div className="rounded-md overflow-hidden">
@@ -112,18 +131,20 @@ const Newsletter = () => {
                       </Button>
                     </div>
                   </div>
-                  {/* Status besked container med fast højde */}
+                  {/* Status and error message container */}
                   <div className="h-8 relative">
-                    {status && (
+                    {(status || error) && (
                       <p
                         className={`absolute inset-0 flex items-center text-sm font-medium ${
+                          error ? "text-red-400" :
                           status === "success"
                             ? "text-green-400"
                             : "text-[--blue]"
                         }`}
                       >
                         <TranslatedText>
-                          {status === "success"
+                          {error ? error :
+                           status === "success"
                             ? "Tak! Du er nu tilmeldt vores nyhedsbrev"
                             : "Du er allerede tilmeldt vores nyhedsbrev"}
                         </TranslatedText>
