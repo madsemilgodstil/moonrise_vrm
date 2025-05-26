@@ -1,22 +1,24 @@
 "use client";
 
+import { useMemo } from "react";
 import TranslatedText from "@/components/translatedText/TranslatedText";
 
 const ShowCard = ({ image, title, description, date, adresse }) => {
-  const formattedDate = new Date(date).toLocaleDateString("da-DK", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-
-  const formattedTime = new Date(date).toLocaleTimeString("da-DK", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-
-  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    adresse
-  )}`;
+  const { formattedDate, formattedTime, googleMapsUrl } = useMemo(() => {
+    const dateObj = new Date(date);
+    return {
+      formattedDate: dateObj.toLocaleDateString("da-DK", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }),
+      formattedTime: dateObj.toLocaleTimeString("da-DK", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      googleMapsUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(adresse)}`
+    };
+  }, [date, adresse]);
 
   return (
     <div className="relative">

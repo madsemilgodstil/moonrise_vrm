@@ -1,27 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import ShowCard from "./ShowCard";
 import TranslatedText from "@/components/translatedText/TranslatedText";
 
 const ShowsGallery = ({ shows }) => {
-  const [upcomingShows, setUpcomingShows] = useState([]);
-  const [pastShows, setPastShows] = useState([]);
-
-  useEffect(() => {
+  const { upcomingShows, pastShows } = useMemo(() => {
     const now = new Date();
+    
+    // Konverter datoer én gang for bedre performance
+    const showsWithParsedDates = shows.map(show => ({
+      ...show,
+      parsedDate: new Date(show.date)
+    }));
 
     // Sortér shows baseret på dato
-    const upcoming = shows
-      .filter((show) => new Date(show.date) > now)
-      .sort((a, b) => new Date(a.date) - new Date(b.date));
+    const upcoming = showsWithParsedDates
+      .filter((show) => show.parsedDate > now)
+      .sort((a, b) => a.parsedDate - b.parsedDate);
 
-    const past = shows
-      .filter((show) => new Date(show.date) <= now)
-      .sort((a, b) => new Date(b.date) - new Date(a.date)); // Nyeste først
+    const past = showsWithParsedDates
+      .filter((show) => show.parsedDate <= now)
+      .sort((a, b) => b.parsedDate - a.parsedDate); // Nyeste først
 
-    setUpcomingShows(upcoming);
-    setPastShows(past);
+    return { upcomingShows: upcoming, pastShows: past };
   }, [shows]);
 
   const renderShowsGrid = (shows, emptyMessage) => {

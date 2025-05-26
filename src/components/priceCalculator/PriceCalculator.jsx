@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import Image from "next/image";
 import TranslatedText from "@/components/translatedText/TranslatedText";
 import { savePrice } from "@/lib/supabase";
+import { validateEmail, debounce } from "@/utils/validation";
 
 const PriceCalculator = () => {
   const [formData, setFormData] = useState({
@@ -17,7 +18,7 @@ const PriceCalculator = () => {
   const [submitStatus, setSubmitStatus] = useState("");
   const [errors, setErrors] = useState({});
 
-  const validateForm = () => {
+  const validateForm = useCallback(() => {
     const newErrors = {};
     
     // Validate name
@@ -28,11 +29,9 @@ const PriceCalculator = () => {
     }
 
     // Validate email
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!formData.email.trim()) {
-      newErrors.email = "Email er påkrævet";
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = "Ugyldig email adresse";
+    const emailError = validateEmail(formData.email);
+    if (emailError) {
+      newErrors.email = emailError;
     }
 
     // Validate price
@@ -42,7 +41,7 @@ const PriceCalculator = () => {
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
+  }, [formData]);
   const [droneCount, setDroneCount] = useState(50);
   const FIXED_COST = 10000;
 
@@ -57,18 +56,25 @@ const PriceCalculator = () => {
   }, [submitStatus]);
 
   // Opdater droneCount når prisen ændres
-  useEffect(() => {
+  const calculatedDroneCount = useMemo(() => {
     const price = formData.price;
-    if (price <= 200000) setDroneCount(50);
-    else if (price <= 275000) setDroneCount(100);
-    else if (price <= 350000) setDroneCount(150);
-    else if (price <= 425000) setDroneCount(200);
-    else setDroneCount(250);
+    if (price <= 200000) return 50;
+    if (price <= 275000) return 100;
+    if (price <= 350000) return 150;
+    if (price <= 425000) return 200;
+    return 250;
   }, [formData.price]);
 
-  const handlePriceChange = (newPrice) => {
-    setFormData((prev) => ({ ...prev, price: newPrice }));
-  };
+  useEffect(() => {
+    setDroneCount(calculatedDroneCount);
+  }, [calculatedDroneCount]);
+
+  const handlePriceChange = useCallback(
+    debounce((newPrice) => {
+      setFormData((prev) => ({ ...prev, price: newPrice }));
+    }, 100),
+    []
+  );
 
   const formatPrice = (price) => {
     const formattedNumber = new Intl.NumberFormat("da-DK").format(
@@ -79,7 +85,7 @@ const PriceCalculator = () => {
       : `${formattedNumber} kr.`;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     setSubmitStatus("");
 
@@ -131,7 +137,7 @@ const PriceCalculator = () => {
     }
 
     setIsSubmitting(false);
-  };
+  }, [formData, validateForm, droneCount, FIXED_COST]);
 
   return (
     <div className="bg-black text-white py-16">
